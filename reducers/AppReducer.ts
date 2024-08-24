@@ -17,7 +17,7 @@ type UpdateAction = {
 export type Action = UpdateAction;
 
 export const initState: State = {
-  displayNavigation: false,
+  displayNavigation: true,
   themeMode: 'light',
   currentModel: 'gpt-3.5',
 };

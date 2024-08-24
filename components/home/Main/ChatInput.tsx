@@ -1,4 +1,5 @@
 import Button from '@/components/common/button';
+import { AiFillGithub } from 'react-icons/ai';
 import { FiSend } from 'react-icons/fi';
 import { MdRefresh } from 'react-icons/md';
 import { PiLightningFill } from 'react-icons/pi';
@@ -31,7 +32,7 @@ export default function ChatInput() {
         </div>
       </div>
 
-      <footer className="text-center text-sm text-gray-700 dark:text-gray-300 px-4 pb-6">
+      <footer className="text-center text-sm text-gray-700 dark:text-gray-300 px-4 pt-2 pb-6 flex items-center justify-center">
         ©{new Date().getFullYear()}&nbsp;
         <a
           className="font-medium border-b border-dotted border-black/60 hover:border-black/0 dark:border-gray-200 hover:bg-gray-200/0 animate-underline"
@@ -41,6 +42,9 @@ export default function ChatInput() {
           ChatApp-Next
         </a>
         .&nbsp; 基于第三方提供的API，仅供学习交流使用，请勿用于商业用途。
+        <a href="https://github.com/Mok-CC/ChatApp-Next" target="_blank">
+          <AiFillGithub />
+        </a>
       </footer>
     </div>
   );

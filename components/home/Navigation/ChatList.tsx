@@ -11,21 +11,6 @@ export default function ChatList() {
       updateTime: Date.now(),
     },
     {
-      id: '1',
-      title: 'Chat 1sdsdsadsadsadadsdadadd',
-      updateTime: Date.now(),
-    },
-    {
-      id: '1',
-      title: 'Chat 1sdsdsadsadsadadsdadadd',
-      updateTime: Date.now(),
-    },
-    {
-      id: '1',
-      title: 'Chat 1sdsdsadsadsadadsdadadd',
-      updateTime: Date.now(),
-    },
-    {
       id: '2',
       title: 'Chat 2',
       updateTime: Date.now(),
@@ -58,21 +43,6 @@ export default function ChatList() {
     {
       id: '8',
       title: 'Chat 8',
-      updateTime: Date.now(),
-    },
-    {
-      id: '9',
-      title: 'Chat 9',
-      updateTime: Date.now(),
-    },
-    {
-      id: '9',
-      title: 'Chat 9',
-      updateTime: Date.now(),
-    },
-    {
-      id: '9',
-      title: 'Chat 9',
       updateTime: Date.now(),
     },
     {
