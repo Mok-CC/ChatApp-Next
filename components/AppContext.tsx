@@ -12,6 +12,7 @@ import {
 type State = {
   displayNavigation: boolean;
   themeMode: 'dark' | 'light';
+  currentModel: string;
 };
 type AppContextProps = {
   state: State;

@@ -1,3 +1,4 @@
+import ChatInput from './ChatInput';
 import Example from './Example';
 import ModelSelect from './ModelSelect';
 
@@ -7,6 +8,7 @@ export default function Welcome() {
       <ModelSelect />
       <h1 className="mt-20 text-4xl font-bold">基于Next的免费ChatApp</h1>
       <Example />
+      <ChatInput />
     </div>
   );
 }
