@@ -1,3 +1,4 @@
+import Markdown from '@/components/common/Markdown';
 import { Message } from '@/types/chat';
 import { FaRegSmileBeam } from 'react-icons/fa';
 import { SiOpenai } from 'react-icons/si';
@@ -43,7 +44,9 @@ export default function MessageList() {
                 <div className="text-3xl leading-[1]">
                   {message.role === 'user' ? <FaRegSmileBeam /> : <SiOpenai />}
                 </div>
-                <div className="flex-1">{message.content}</div>
+                <div className="flex-1">
+                  <Markdown>{message.content}</Markdown>
+                </div>
               </div>
             </li>
           );
