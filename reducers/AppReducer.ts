@@ -1,6 +1,7 @@
 export type State = {
   displayNavigation: boolean;
   themeMode: 'dark' | 'light';
+  currentModel: string;
 };
 
 export enum ActionTypes {
@@ -18,6 +19,7 @@ export type Action = UpdateAction;
 export const initState: State = {
   displayNavigation: false,
   themeMode: 'light',
+  currentModel: 'gpt-3.5',
 };
 
 export function reducer(state: State, action: Action) {
