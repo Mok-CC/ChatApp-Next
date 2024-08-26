@@ -26,7 +26,7 @@ function Markdown({ children, className = '', ...props }: Options) {
         },
       }}
       remarkPlugins={[remarkGfm]}
-      className={`markdown prose dark:prose-invert ${className}`}
+      className={`markdown dark:prose-invert ${className}`}
       {...props}
     >
       {children}

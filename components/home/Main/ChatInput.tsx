@@ -1,4 +1,5 @@
 import Button from '@/components/common/button';
+import { useState } from 'react';
 import { AiFillGithub } from 'react-icons/ai';
 import { FiSend } from 'react-icons/fi';
 import { MdRefresh } from 'react-icons/md';
@@ -6,6 +7,34 @@ import { PiLightningFill } from 'react-icons/pi';
 import TextareaAutoSize from 'react-textarea-autosize';
 
 export default function ChatInput() {
+  const [messageText, setMessageText] = useState('');
+  async function send() {
+    const body = JSON.stringify({ messageText });
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {
+        contentType: 'application/json',
+      },
+      body,
+    });
+    if (!response.ok) {
+      console.log(response.statusText);
+    }
+    if (!response.body) {
+      console.log('no response body');
+      return;
+    }
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder(); // 解码
+    let done = false;
+    while (!done) {
+      const result = await reader.read();
+      done = result.done;
+      const chunk = decoder.decode(result.value);
+      console.log(chunk);
+    }
+    setMessageText('');
+  }
   return (
     <div
       className="absolute bottom-0 inset-x-0 bg-gradient-to-b from-[rgba(255,255,255,0)] from-[13.94%] 
@@ -23,11 +52,16 @@ export default function ChatInput() {
             className=" outline-none flex-1 max-h-64 mb-1.5 bg-transparent text-black dark:text-white resize-none border-0"
             placeholder="输入一条信息..."
             rows={1}
+            value={messageText}
+            onChange={(e) => {
+              setMessageText(e.target.value);
+            }}
           />
           <Button
             className="mx-3 !rounded-lg"
             icon={FiSend}
             variant="primary"
+            onClick={send}
           />
         </div>
       </div>
