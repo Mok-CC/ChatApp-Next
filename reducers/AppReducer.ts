@@ -1,10 +1,11 @@
-import { Message } from 'postcss';
+import { Message } from '@/types/chat';
 
 export type State = {
   displayNavigation: boolean;
   themeMode: 'dark' | 'light';
   currentModel: string;
   messageList: Message[];
+  streamingId: string;
 };
 
 export enum ActionTypes {
@@ -31,6 +32,7 @@ export const initState: State = {
   themeMode: 'light',
   currentModel: 'gpt-3.5',
   messageList: [],
+  streamingId: '',
 };
 
 export function reducer(state: State, action: Action) {
@@ -48,6 +50,7 @@ export function reducer(state: State, action: Action) {
         }
         return message;
       });
+      return { ...state, messageList };
     }
     default:
       throw new Error();

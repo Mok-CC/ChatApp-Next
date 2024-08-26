@@ -1,6 +1,6 @@
 'use client';
 
-import { Action, initState, reducer } from '@/reducers/AppReducer';
+import { Action, initState, reducer, State } from '@/reducers/AppReducer';
 import {
   createContext,
   Dispatch,
@@ -9,11 +9,6 @@ import {
   useReducer,
 } from 'react';
 
-type State = {
-  displayNavigation: boolean;
-  themeMode: 'dark' | 'light';
-  currentModel: string;
-};
 type AppContextProps = {
   state: State;
   dispatch: Dispatch<Action>;
