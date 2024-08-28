@@ -2,7 +2,7 @@ import { useAppContext } from '@/components/AppContext';
 import Button from '@/components/common/button';
 import { ActionTypes } from '@/reducers/AppReducer';
 import { Message, MessageRequestBody } from '@/types/chat';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { AiFillGithub } from 'react-icons/ai';
 import { FiSend } from 'react-icons/fi';
 import { MdRefresh } from 'react-icons/md';
@@ -12,6 +12,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 export default function ChatInput() {
   const [messageText, setMessageText] = useState('');
+  const stopRef = useRef(false);
   const {
     state: { messageList, currentModel, streamingId },
     dispatch,
@@ -23,17 +24,38 @@ export default function ChatInput() {
       role: 'user',
       content: messageText,
     };
-    const messages = messageList.concat([message]); // 合并消息
-
-    const body: MessageRequestBody = { messages, model: currentModel };
     dispatch({ type: ActionTypes.ADD_MESSAGE, message });
+    const messages = messageList.concat([message]); // 合并消息
+    dosend(messages);
+  }
+
+  async function resend() {
+    const messages = [...messageList];
+    if (
+      messages.length !== 0 &&
+      messageList[messages.length - 1].role === 'assistant'
+    ) {
+      dispatch({
+        type: ActionTypes.REMOVE_MESSAGE,
+        message: messages[messages.length - 1],
+      });
+      messages.splice(messages.length - 1, 1);
+    }
+    dosend(messages);
+  }
+
+  async function dosend(messages: Message[]) {
+    const body: MessageRequestBody = { messages, model: currentModel };
+
     setMessageText('');
 
+    const controller = new AbortController(); // 取消请求的控制器
     const response = await fetch('/api/chat', {
       method: 'POST',
       headers: {
         contentType: 'application/json',
       },
+      signal: controller.signal, // 取消请求的信号
       body: JSON.stringify(body),
     });
     if (!response.ok) {
@@ -60,6 +82,11 @@ export default function ChatInput() {
     let done = false;
     let content = '';
     while (!done) {
+      if (stopRef.current) {
+        stopRef.current = false;
+        controller.abort();
+        break; // 停止读取
+      }
       const result = await reader.read();
       done = result.done;
       const chunk = decoder.decode(result.value);
@@ -84,11 +111,21 @@ export default function ChatInput() {
       <div className="w-full max-w-4xl mx-auto flex flex-col items-center px-4 space-y-5">
         {messageList.length !== 0 &&
           (streamingId !== '' ? (
-            <Button icon={PiStopBold} variant="primary" className="font-medium">
+            <Button
+              onClick={() => (stopRef.current = true)}
+              icon={PiStopBold}
+              variant="primary"
+              className="font-medium"
+            >
               停止生成
             </Button>
           ) : (
-            <Button icon={MdRefresh} variant="primary" className="font-medium">
+            <Button
+              onClick={resend}
+              icon={MdRefresh}
+              variant="primary"
+              className="font-medium"
+            >
               重新生成
             </Button>
           ))}

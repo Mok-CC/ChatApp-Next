@@ -12,10 +12,14 @@ export enum ActionTypes {
   UPDATE = 'UPDATE',
   ADD_MESSAGE = 'ADD_MESSAGE',
   UPDATE_MESSAGE = 'UPDATE_MESSAGE',
+  REMOVE_MESSAGE = 'REMOVE_MESSAGE',
 }
 
 type MessageAction = {
-  type: ActionTypes.ADD_MESSAGE | ActionTypes.UPDATE_MESSAGE;
+  type:
+    | ActionTypes.ADD_MESSAGE
+    | ActionTypes.UPDATE_MESSAGE
+    | ActionTypes.REMOVE_MESSAGE;
   message: Message;
 };
 
@@ -49,6 +53,12 @@ export function reducer(state: State, action: Action) {
           return action.message;
         }
         return message;
+      });
+      return { ...state, messageList };
+    }
+    case ActionTypes.REMOVE_MESSAGE: {
+      const messageList = state.messageList.filter((message) => {
+        return message.id !== action.message.id;
       });
       return { ...state, messageList };
     }
