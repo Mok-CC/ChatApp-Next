@@ -1,5 +1,4 @@
 import prisma from '@/lib/prisma';
-import { data } from 'autoprefixer';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
