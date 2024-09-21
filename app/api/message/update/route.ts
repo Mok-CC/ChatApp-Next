@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     });
     data.chatId = chat.id;
   }
-  let message = await prisma.message.upsert({
+  const message = await prisma.message.upsert({
     create: data,
     update: data,
     where: {

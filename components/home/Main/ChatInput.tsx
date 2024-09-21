@@ -1,5 +1,6 @@
 import { useAppContext } from '@/components/AppContext';
 import Button from '@/components/common/button';
+import { useEventBusContext } from '@/components/EventBusContext';
 import { ActionTypes } from '@/reducers/AppReducer';
 import { Message, MessageRequestBody } from '@/types/chat';
 import { useRef, useState } from 'react';
@@ -13,17 +14,55 @@ import { v4 as uuidv4 } from 'uuid';
 export default function ChatInput() {
   const [messageText, setMessageText] = useState('');
   const stopRef = useRef(false);
+  const chatIdRef = useRef(''); // 聊天id
   const {
     state: { messageList, currentModel, streamingId },
     dispatch,
   } = useAppContext(); // 历史消息列表
+  const { publish } = useEventBusContext(); //发布事件
+
+  async function createOrUpdateMessage(message: Message) {
+    const response = await fetch('/api/message/update', {
+      method: 'POST',
+      headers: {
+        contentType: 'application/json',
+      },
+      body: JSON.stringify(message),
+    });
+    if (!response.ok) {
+      console.log(response.statusText);
+      return;
+    }
+    const { data } = await response.json();
+    if (!chatIdRef.current) {
+      chatIdRef.current = data.message.chatId;
+      publish('eventBus');
+    }
+    return data.message;
+  }
+
+  async function deleteMessage(id: string) {
+    const response = await fetch('/api/message/delete', {
+      method: 'POST',
+      headers: {
+        contentType: 'application/json',
+      },
+    });
+    if (!response.ok) {
+      console.log(response.statusText);
+      return;
+    }
+    const { code } = await response.json();
+    return code === 0;
+  }
 
   async function send() {
-    const message: Message = {
-      id: uuidv4(),
-      role: 'user',
+    const message: Message = await createOrUpdateMessage({
+      id: '',
+      chatId: chatIdRef.current,
       content: messageText,
-    };
+      role: 'user',
+    });
     dispatch({ type: ActionTypes.ADD_MESSAGE, message });
     const messages = messageList.concat([message]); // 合并消息
     dosend(messages);
@@ -35,6 +74,11 @@ export default function ChatInput() {
       messages.length !== 0 &&
       messageList[messages.length - 1].role === 'assistant'
     ) {
+      const result = await deleteMessage(messages[messages.length - 1].id);
+      if (!result) {
+        console.log('delete message failed');
+        return;
+      }
       dispatch({
         type: ActionTypes.REMOVE_MESSAGE,
         message: messages[messages.length - 1],
@@ -66,11 +110,13 @@ export default function ChatInput() {
       return;
     }
 
-    const responseMessage: Message = {
-      id: uuidv4(),
-      role: 'assistant',
+    const responseMessage: Message = await createOrUpdateMessage({
+      id: '',
+      chatId: chatIdRef.current,
       content: '',
-    };
+      role: 'assistant',
+    });
+
     dispatch({ type: ActionTypes.ADD_MESSAGE, message: responseMessage });
     dispatch({
       type: ActionTypes.UPDATE,
@@ -96,6 +142,10 @@ export default function ChatInput() {
         message: { ...responseMessage, content },
       });
     }
+
+    // 更新服务端记录
+    createOrUpdateMessage({ ...responseMessage, content });
+
     dispatch({
       type: ActionTypes.UPDATE,
       field: 'streamingId',

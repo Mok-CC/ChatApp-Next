@@ -1,6 +1,7 @@
 import '@/styles/globals.css';
 import '@/styles/markdown.css';
 import AppContextProvider from '@/components/AppContext';
+import EventBusContextProvide from '@/components/EventBusContext';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 
@@ -19,7 +20,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <AppContextProvider>{children}</AppContextProvider>
+        <AppContextProvider>
+          <EventBusContextProvide>{children}</EventBusContextProvide>
+        </AppContextProvider>
       </body>
     </html>
   );
