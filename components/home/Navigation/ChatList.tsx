@@ -1,71 +1,49 @@
 import { groupByDate } from '@/common/util';
 import { Chat } from '@/types/chat';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import ChatItem from './ChatItem';
 import { useEventBusContext } from '@/components/EventBusContext';
+import { useAppContext } from '@/components/AppContext';
+import { ActionTypes } from '@/reducers/AppReducer';
 
 export default function ChatList() {
-  const [ChatList, setChatList] = useState<Chat[]>([
-    {
-      id: '1',
-      title: 'Chat 1sdsdsadsadsadadsdadadd',
-      updateTime: Date.now(),
-    },
-    {
-      id: '2',
-      title: 'Chat 2',
-      updateTime: Date.now(),
-    },
-    {
-      id: '3',
-      title: 'Chat 3',
-      updateTime: Date.now(),
-    },
-    {
-      id: '4',
-      title: 'Chat 4',
-      updateTime: Date.now(),
-    },
-    {
-      id: '5',
-      title: 'Chat 5',
-      updateTime: Date.now(),
-    },
-    {
-      id: '6',
-      title: 'Chat 6',
-      updateTime: Date.now(),
-    },
-    {
-      id: '7',
-      title: 'Chat 7',
-      updateTime: Date.now(),
-    },
-    {
-      id: '8',
-      title: 'Chat 8',
-      updateTime: Date.now(),
-    },
-    {
-      id: '9',
-      title: 'Chat 9',
-      updateTime: Date.now(),
-    },
-    {
-      id: '10',
-      title: 'Chat 10',
-      updateTime: Date.now(),
-    },
-  ]);
-  const [selectedChat, setSelectedChat] = useState<Chat>();
+  const [chatList, setChatList] = useState<Chat[]>([]);
+  const pageRef = useRef(1); // 页码
   const groupList = useMemo(() => {
-    return groupByDate(ChatList);
-  }, [ChatList]);
+    return groupByDate(chatList);
+  }, [chatList]);
   const { subscribe, unsubscribe } = useEventBusContext();
+
+  const {
+    state: { selectedChat },
+    dispatch,
+  } = useAppContext();
+
+  // 网络请求 分页获取数据
+  async function getData() {
+    const response = await fetch(`/api/chat/list?page=${pageRef.current}`, {
+      method: 'GET',
+    });
+    if (!response.ok) {
+      console.log(response.statusText);
+      return;
+    }
+    const { data } = await response.json();
+    if (pageRef.current === 1) {
+      setChatList(data.list);
+    } else {
+      setChatList((list) => list.concat(data.list));
+    }
+  }
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   useEffect(() => {
     const callback: EventListener = () => {
-      console.log('eventBus');
+      pageRef.current = 1;
+      getData();
     };
     subscribe('eventBus', callback);
     return () => unsubscribe('eventBus', callback);
@@ -89,7 +67,13 @@ export default function ChatList() {
                     key={item.id}
                     item={item}
                     selected={selected}
-                    onSelected={(chat) => setSelectedChat(chat)}
+                    onSelected={(chat) =>
+                      dispatch({
+                        type: ActionTypes.UPDATE,
+                        field: 'selectedChat',
+                        value: chat,
+                      })
+                    }
                   />
                 );
               })}

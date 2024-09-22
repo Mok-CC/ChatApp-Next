@@ -1,5 +1,4 @@
 import { Chat } from '@/types/chat';
-import { resolve } from 'path';
 
 export function groupByDate(chatList: Chat[]) {
   const groupMap = new Map<string, Chat[]>();
